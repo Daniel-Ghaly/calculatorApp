@@ -18,7 +18,7 @@ function App(props) {
   var [arithmeticArray, setArithmeticArray] = useState([])
   var buttons = ['AC', '%', 'π', '/',7, 8, 9, 'x',
   4, 5, 6, '-', 1, 2, 3, '+',
-  0, '.', '=','c','(',')','sin','cos','tan']
+  0, '.', '=','c','(',')','sin','cos','tan','√','x^y','n!']
 
   function handleButtonClick(button) {
 
@@ -56,17 +56,89 @@ function App(props) {
       var count = 0;
 
       // convery arithmeticString to array i.e.  '10x7+2' ==> ['10','x','7','+','2']
-      const operationArray = [];
+      var operationArray = [];
       let current = '';
       for (let i = 0; i < arithmeticString.length; i++) {
 
-        // // account for cos/sin/tan functions
-        //   if (arithmeticString.slice(i, i+3) === 'cos') {
-        //     var endIndex;
-        //     for (var j = 0; j < arithmeticString.length; j++) {
-        //       if (j === 0)
-        //     }
-        //     var trigExpression = arithmeticString.slice(i, i + 3)
+
+        // exponent x^y button
+
+        if (arithmeticString.slice(i, i+1) === '^') {
+          debugger;
+          var endIndex;
+          for (var j = i + 1; j < arithmeticString.length; j++) {
+            if (arithmeticString[j] === ')') {
+              endIndex = j
+            }
+          }
+
+          // get inner value i.e. √(49)  => 49
+          var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
+          operationArray.push((arithmeticString[i-1])**(innerValue));
+
+        }
+
+
+
+        if (arithmeticString.slice(i, i+1) === '√') {
+          debugger;
+          var endIndex;
+          for (var j = i + 1; j < arithmeticString.length; j++) {
+            if (arithmeticString[j] === ')') {
+              endIndex = j
+            }
+          }
+
+          // get inner value i.e. √(49)  => 49
+          var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
+          operationArray.push(innerValue**(.5));
+
+        }
+
+
+        // cos function
+          if (arithmeticString.slice(i, i+3) === 'cos') {
+            var endIndex;
+            for (var j = i + 3; j < arithmeticString.length; j++) {
+              if (arithmeticString[j] === ')') {
+                endIndex = j
+              }
+            }
+
+            // get inner value i.e. cos(3.14) => 3.14
+            var innerValue = Number(arithmeticString.slice(i + 4, endIndex))
+            operationArray.push(Math.cos(innerValue));
+
+          }
+
+        // sin function
+
+          if (arithmeticString.slice(i, i+3) === 'sin') {
+            var endIndex;
+
+            for (var j = i + 3; j < arithmeticString.length; j++) {
+              if (arithmeticString[j] === ')') {
+                endIndex = j
+              }
+            }
+            var innerValue = Number(arithmeticString.slice(i + 4, endIndex))
+            operationArray.push(Math.sin(innerValue));
+
+          }
+
+        // tan function
+          if (arithmeticString.slice(i, i+3) === 'tan') {
+            var endIndex;
+
+            for (var j = i + 3; j < arithmeticString.length; j++) {
+              if (arithmeticString[j] === ')') {
+                endIndex = j
+              }
+            }
+            var innerValue = Number(arithmeticString.slice(i + 4, endIndex))
+            operationArray.push(Math.tan(innerValue));
+
+          }
 
 
           if (isNaN(Number(arithmeticString[i])) && arithmeticString[i] !== '.' && arithmeticString[i] !== 'π' ) {
@@ -76,6 +148,8 @@ function App(props) {
           } else {
               current += arithmeticString[i];
           }
+
+
 
       }
       operationArray.push(current);
@@ -120,17 +194,25 @@ function App(props) {
 
     }
 
-    // populate arithmeticArray (i.e. [6,x,2,=])
-    if(typeof button === 'number' || 'π','(',')', 'cos', 'sin', 'tan'].includes(button) )
-    if (['+','-','x','/'].includes(button)) {
 
-    }
 
     // concatenate numbers and operation characters to the arithmeticString -- i.e. '6+2*3'
-    if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan'].includes(button) ) {
+    if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y'].includes(button) ) {
 
-      // also concatenate to currentNumber state, if a non-operator character
-      setCurrentNumber(currentNumber += button)
+      // handle edge case where user inputs operation before number
+      if (arithmeticString.length === 0 && ['+','-','x','/','=','x^y'].includes(button) ) {
+      return;
+    }
+
+      // auto-add first parenthesis for sqrt and trig functions
+      if (['√', 'sin', 'cos', 'tan'].includes(button)) {
+        button += '('
+      }
+
+      // add exponent ^ symbol when pressing x^y button
+      if (button === 'x^y') {
+        button = '^('
+      }
 
       // clear result and arithmetic string if result view is currently being shown
       if(result) {
@@ -138,15 +220,12 @@ function App(props) {
         setResult(null)
       }
 
-      // handle edge case where user inputs operation before number
-      if (arithmeticString.length === 0 && ['+','-','x','/','='].includes(button) ) {
-        return;
-      }
+
         // handle edge case where user inputs two operations in a row
-      if (['+','-','x','/','='].includes(arithmeticString.slice(-1)) ) {
+      if (['+','-','x','/','=','x^y','^'].includes(arithmeticString.slice(-1)) ) {
         if(button === arithmeticString.slice(-1)) {
           return;
-        } else if (['+','-','x','/','='].includes(button)) {
+        } else if (['+','-','x','/','=','x^y','^'].includes(button)) {
           // still allow user to change operation without having to clear last character
           arithmeticString = arithmeticString.slice(0, -1)
           setArithmeticString(arithmeticString += button.toString())
@@ -161,8 +240,18 @@ function App(props) {
 
     // if user clicks '=', evalulate result using evaluatearithmeticString function
     if (button === '=') {
-      // check for parentheses to eveluate that arithmeticString first
-      while (arithmeticString.includes('(')) {
+
+      // edge case: if user leaves out parentheses, automatically add second parenthesis
+      // i.e. √(49  would give 7 instead of an error
+
+      if (arithmeticString.includes('(') && !arithmeticString.includes(')')) {
+        arithmeticString = arithmeticString.slice(0, -1)
+        setArithmeticString(arithmeticString += ')=')
+      }
+
+
+      // check for parentheses to eveluate that arithmeticString first; exclude trig/sqrt/exponent functions for separation of concerns
+      while (arithmeticString.includes('(') && !arithmeticString.includes('cos(') && !arithmeticString.includes('sin(') && !arithmeticString.includes('tan(') && !arithmeticString.includes('√(') && !arithmeticString.includes('^(')) {
         // substring between pair of (); i.e. '6+(3+4)' ==> '3+4'
         var startIndex = arithmeticString.indexOf('(') + 1
         var endIndex = arithmeticString.indexOf(')')
