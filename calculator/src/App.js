@@ -43,210 +43,206 @@ function App(props) {
     }
   }
 
+   // function to evaluate any operation string (i.e. '6+3x8' ) and set result to 'result' state
+   function evaluateArithmeticString(arithmeticString) {
+    ;
+    // initialize result
+    var count = 0;
 
-  function handleButtonClick(button) {
+     // handle edge case where pi has no operators but user presses '=' -> return pi value
+     if (arithmeticString === ('π=')) {
+      // round to 6 decimals for better readibility
+      setResult(Math.round(Math.PI * 100000) / 100000);
+      return Math.round(Math.PI * 100000) / 100000;
 
-    // helper function to evaluate any operation string (i.e. '6+3x8' ) and set result to 'result' state
-    function evaluateArithmeticString(arithmeticString) {
-      ;
-      // initialize result
-      var count = 0;
+    }
 
-       // handle edge case where pi has no operators but user presses '=' -> return pi value
-       if (arithmeticString === ('π=')) {
-        // round to 6 decimals for better readibility
-        setResult(Math.round(Math.PI * 100000) / 100000);
-        return Math.round(Math.PI * 100000) / 100000;
+    // convert arithmeticString to array i.e.  '10x7+2' ==> ['10','x','7','+','2']
+    var operationArray = [];
+    let current = '';
+    for (let i = 0; i < arithmeticString.length; i++) {
 
+
+      if (['x','-','/','+','='].includes(arithmeticString[i])) {
+        operationArray.push(current);
+        current = '';
+        operationArray.push(arithmeticString[i]);
+      } else {
+        current += arithmeticString[i];
+      }
+    }
+
+    operationArray.push(current);
+    operationArray = operationArray.slice(0, -1)
+
+
+    // iterate through operationArray to simplify special expressions
+    operationArray.forEach( (character, i) => {
+
+      // handle square root expressions
+      if (character.includes('√')) {
+        var result = Number(character.slice(1))**(0.5)
+        // replace result into operationArray
+        operationArray[i] = result;
       }
 
-      // convert arithmeticString to array i.e.  '10x7+2' ==> ['10','x','7','+','2']
-      var operationArray = [];
-      let current = '';
-      for (let i = 0; i < arithmeticString.length; i++) {
-
-
-        if (['x','-','/','+','='].includes(arithmeticString[i])) {
-          operationArray.push(current);
-          current = '';
-          operationArray.push(arithmeticString[i]);
-        } else {
-          current += arithmeticString[i];
-        }
+      // handle sin expressions
+      if (character.includes('sin')) {
+        var result = Math.sin(Number(character.slice(3)))
+        // replace result into operationArray
+        operationArray[i] = result;
       }
 
-      operationArray.push(current);
-      operationArray = operationArray.slice(0, -1)
-
-
-      operationArray.forEach( (character, i) => {
-
-        // handle square root expressions
-        if (character.includes('√')) {
-          var result = Number(character.slice(1))**(0.5)
-          // replace result into operationArray
-          operationArray[i] = result;
-        }
-
-        // handle sin expressions
-        if (character.includes('sin')) {
-          var result = Math.sin(Number(character.slice(3)))
-          // replace result into operationArray
-          operationArray[i] = result;
-        }
-
-        // handle cos expressions
-        if (character.includes('cos')) {
-          var result = Math.cos(Number(character.slice(3)))
-          // replace result into operationArray
-          operationArray[i] = result;
-        }
-
-        // handle tan expressions
-        if (character.includes('tan')) {
-          var result = Math.tan(Number(character.slice(3)))
-          // replace result into operationArray
-          operationArray[i] = result;
-        }
-
-        // handle exponent functions
-        if (character.includes('^')) {
-          var carrotIndex = character.indexOf('^')
-          var baseNumber = character.slice(0, carrotIndex)
-          var exponent = character.slice(carrotIndex + 1)
-          var result = baseNumber**(exponent)
-          // replace result into operationArray
-          operationArray[i] = result;
-        }
-
-
-      })
-
-
-
-      // operationArray populated ==> now to evaluate the array...
-
-
-      // handle edge case where no operation is inputted --> just return number
-      if (operationArray.length === 2) {
-        setResult(Math.round(operationArray[0] * 100000) / 100000)
+      // handle cos expressions
+      if (character.includes('cos')) {
+        var result = Math.cos(Number(character.slice(3)))
+        // replace result into operationArray
+        operationArray[i] = result;
       }
 
+      // handle tan expressions
+      if (character.includes('tan')) {
+        var result = Math.tan(Number(character.slice(3)))
+        // replace result into operationArray
+        operationArray[i] = result;
+      }
 
-      // evaluate sin expressions
-      operationArray.forEach((character, i) => {
-        if (character.includes('sin')) {
-          ;
-          // get n of factorial i.e. 25! ==> 25
-          var n = character.slice(0, -1)
-          var factorial = getFactorial(n)
-          // change factorial to evaluated result
-          operationArray[i] = factorial
-        }
-      })
-
-
+      // handle exponent functions
+      if (character.includes('^')) {
+        var carrotIndex = character.indexOf('^')
+        var baseNumber = character.slice(0, carrotIndex)
+        var exponent = character.slice(carrotIndex + 1)
+        var result = baseNumber**(exponent)
+        // replace result into operationArray
+        operationArray[i] = result;
+      }
 
       // evaluate factorial
-      operationArray.forEach((character, i) => {
-        if (character.includes('!')) {
-          // get n of factorial i.e. 25! ==> 25
-          var n = character.slice(0, -1)
-          var factorial = getFactorial(n)
-          // change factorial to evaluated result
-          operationArray[i] = factorial
-        }
-      })
+      if (character.includes('!')) {
+        // get n of factorial i.e. 25! ==> 25
+        var n = character.slice(0, -1)
+        var factorial = getFactorial(n)
+        // change factorial to evaluated result
+        operationArray[i] = factorial
+      }
 
-      function getFactorial(num) {
+      // helper function to calculate any factorial, given a number n
+      function getFactorial(n) {
         var product = 1;
-        for (var i = num; i > 0; i--) {
+        for (var i = n; i > 0; i--) {
           product *= i
         }
         return product;
       }
 
-      // evaluate products and quotients before addition/subtraction (PEMDAS)
-      if (operationArray.includes('x') || operationArray.includes('/')) {
-        operationArray.forEach((character, i) => {
-          if (character === 'x') {
-            var product = evaluateTwoNums(operationArray[i-1], operationArray[i+1], 'x')
-            // replace evaluated product into operationsArray i.e. [3,+,4,*,5,+,4] => [3,20,4]
-            operationArray.splice(i-1, 3, product)
-          } else if (character === '/') {
-            var quotient = evaluateTwoNums(operationArray[i-1], operationArray[i+1], '/')
-            // replace evaluated quotient into operationsArray i.e. [3,+,4,*,2,+,4] => [3,2,4]
-            operationArray.splice(i-1, 3, quotient)
-          }
-        });
-      }
 
-      // add/subtract remaining values
+    })
+
+    // handle edge case where no operation is inputted --> just return number
+    if (operationArray.length === 2) {
+      setResult(Math.round(operationArray[0] * 100000) / 100000)
+    }
+
+    // *******
+    // *******
+    // ******* Special expressions are now simplified
+    // ******* below code is to add/multiply/subtract/divide remaining constants and return a calculation
+    // *******
+    // *******
+
+
+    // evaluate products and quotients before addition/subtraction (PEMDAS)
+    if (operationArray.includes('x') || operationArray.includes('/')) {
       operationArray.forEach((character, i) => {
-        // initialize count for first number pressed
-        if(i === 0) {
-          count = Number(operationArray[i])
-          return;
-        }
-        if (character === '+') {
-          count += Number(operationArray[i+1])
-        } else if (character === '-') {
-          count -= (Number(operationArray[i+1]))
+        if (character === 'x') {
+          var product = evaluateTwoNums(operationArray[i-1], operationArray[i+1], 'x')
+          // replace evaluated product into operationsArray i.e. [3,+,4,*,5,+,4] => [3,20,4]
+          operationArray.splice(i-1, 3, product)
+        } else if (character === '/') {
+          var quotient = evaluateTwoNums(operationArray[i-1], operationArray[i+1], '/')
+          // replace evaluated quotient into operationsArray i.e. [3,+,4,*,2,+,4] => [3,2,4]
+          operationArray.splice(i-1, 3, quotient)
         }
       });
-
-      // update 'result' state
-      // handle edge case where decimal is extremely long --> shorten to 6 digits for better readability
-      setResult(Math.round(count * 100000) / 100000);
-      return count
     }
+
+    // add/subtract remaining values
+    operationArray.forEach((character, i) => {
+      // initialize count for first number pressed
+      if(i === 0) {
+        count = Number(operationArray[i])
+        return;
+      }
+      if (character === '+') {
+        count += Number(operationArray[i+1])
+      } else if (character === '-') {
+        count -= (Number(operationArray[i+1]))
+      }
+    });
+
+    // update 'result' state
+    // handle edge case where decimal is extremely long --> shorten to 6 digits for better readability
+    setResult(Math.round(count * 100000) / 100000);
+    return count
+  }
+
+
+  function handleButtonClick(button) {
 
     // concatenate numbers and operation characters to the arithmeticString -- i.e. '6+2*3'
-    if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y', 'n!'].includes(button) ) {
+    createArithmeticString()
 
-      // add factorial symbol to arithmeticString
-      if (button === 'n!') {
-        button = '!'
+    function createArithmeticString() {
+
+      if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y', 'n!'].includes(button) ) {
+
+        // add factorial symbol to arithmeticString
+        if (button === 'n!') {
+          button = '!'
+        }
+
+        // handle edge case where user inputs operation before number
+        if (arithmeticString.length === 0 && ['+','-','x','/','=','x^y','n!'].includes(button) ) {
+        return;
       }
 
-      // handle edge case where user inputs operation before number
-      if (arithmeticString.length === 0 && ['+','-','x','/','=','x^y','n!'].includes(button) ) {
-      return;
-    }
+        // auto-add first parenthesis for sqrt and trig functions
+        if (['√', 'sin', 'cos', 'tan'].includes(button)) {
+          button += '('
+        }
 
-      // auto-add first parenthesis for sqrt and trig functions
-      if (['√', 'sin', 'cos', 'tan'].includes(button)) {
-        button += '('
-      }
+        // add exponent ^ symbol when pressing x^y button
+        if (button === 'x^y') {
+          button = '^('
+        }
 
-      // add exponent ^ symbol when pressing x^y button
-      if (button === 'x^y') {
-        button = '^('
-      }
+        // clear result and arithmetic string if result view is currently being shown
+        if(result) {
+          setArithmeticString('')
+          setResult(null)
+        }
 
-      // clear result and arithmetic string if result view is currently being shown
-      if(result) {
-        setArithmeticString('')
-        setResult(null)
-      }
-
-        // handle edge case where user inputs two operations in a row
-      if (['+','-','x','/','=','x^y','^'].includes(arithmeticString.slice(-1)) ) {
-        if(button === arithmeticString.slice(-1)) {
-          return;
-        } else if (['+','-','x','/','=','x^y','^'].includes(button)) {
-          // still allow user to change operation without having to clear last character
-          arithmeticString = arithmeticString.slice(0, -1)
-          setArithmeticString(arithmeticString += button.toString())
+          // handle edge case where user inputs two operations in a row
+        if (['+','-','x','/','=','x^y','^'].includes(arithmeticString.slice(-1)) ) {
+          if(button === arithmeticString.slice(-1)) {
+            return;
+          } else if (['+','-','x','/','=','x^y','^'].includes(button)) {
+            // still allow user to change operation without having to clear last character
+            arithmeticString = arithmeticString.slice(0, -1)
+            setArithmeticString(arithmeticString += button.toString())
+          } else {
+            setArithmeticString(arithmeticString += button.toString())
+          }
         } else {
           setArithmeticString(arithmeticString += button.toString())
+          }
         }
-      } else {
-        setArithmeticString(arithmeticString += button.toString())
-      }
     }
 
     // if user clicks '=', evalulate result using evaluateArithmeticString function
+    handleEqualSign()
+
+    function handleEqualSign() {
     if (button === '=') {
       ;
 
@@ -288,22 +284,23 @@ function App(props) {
       // pass in arithmetic string to evaluateArithmeticString()
       evaluateArithmeticString(arithmeticString)
     }
-      // delete characters of arithmetic string if user presses 'c' button
-      if (button === 'c') {
-        setArithmeticString(arithmeticString.slice(0, -1))
-        // if in result mode, let 'c' simply clear the whole
-        if (result) {
-          setResult(null)
+    }
 
-        }
-
-      }
-
-      // deletes entire arithmetic string and resets result to null if user presses 'ac' button
-      if(button === 'AC') {
-        setArithmeticString('')
+    // delete characters of arithmetic string if user presses 'c' button
+    if (button === 'c') {
+      setArithmeticString(arithmeticString.slice(0, -1))
+      // if in result mode, let 'c' simply clear the whole
+      if (result) {
         setResult(null)
+
       }
+
+    }
+    // deletes entire arithmetic string and resets result to null if user presses 'ac' button
+    if(button === 'AC') {
+      setArithmeticString('')
+      setResult(null)
+    }
 
   }
 
