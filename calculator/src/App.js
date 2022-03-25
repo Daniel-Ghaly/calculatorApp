@@ -79,141 +79,48 @@ function App(props) {
       operationArray = operationArray.slice(0, -1)
 
 
+      operationArray.forEach( (character, i) => {
 
-        // exponent functionality
+        // handle square root expressions
+        if (character.includes('√')) {
+          var result = Number(character.slice(1))**(0.5)
+          // replace result into operationArray
+          operationArray[i] = result;
+        }
 
-        // if (operationArray.slice(i, i+1) === '^') {
-        //   var endIndex;
-        //   for (var j = i + 1; j < arithmeticString.length; j++) {
-        //     if (arithmeticString[j] === ')') {
-        //       endIndex = j
-        //     }
-        //   }
+        // handle sin expressions
+        if (character.includes('sin')) {
+          var result = Math.sin(Number(character.slice(3)))
+          // replace result into operationArray
+          operationArray[i] = result;
+        }
 
-        //   // get inner value i.e. √(49)  => 49
-        //   var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
-        //   operationArray.push((arithmeticString[i-1])**(innerValue));
+        // handle cos expressions
+        if (character.includes('cos')) {
+          var result = Math.cos(Number(character.slice(3)))
+          // replace result into operationArray
+          operationArray[i] = result;
+        }
 
-        // }
+        // handle tan expressions
+        if (character.includes('tan')) {
+          var result = Math.tan(Number(character.slice(3)))
+          // replace result into operationArray
+          operationArray[i] = result;
+        }
 
-        // sqrt functionality
-        operationArray.forEach( (character, i) => {
-
-          // handle sqrt
-          if (character.includes('√')) {
-            var result = Number(character.slice(1))**(0.5)
-            // replace result into operationArray
-            operationArray[i] = result;
-          }
-
-          // handle sin
-          if (character.includes('sin')) {
-            var result = Math.sin(Number(character.slice(3)))
-            // replace result into operationArray
-            operationArray[i] = result;
-          }
-
-          // handle cos
-          if (character.includes('cos')) {
-            var result = Math.cos(Number(character.slice(3)))
-            // replace result into operationArray
-            operationArray[i] = result;
-          }
-
-          // handle exponent functions
-          if (character.includes('^')) {
-            var carrotIndex = character.indexOf('^')
-            var baseNumber = character.slice(0, carrotIndex)
-            var exponent = character.slice(carrotIndex + 1)
-            var result = baseNumber**(exponent)
-            // replace result into operationArray
-            operationArray[i] = result;
-          }
+        // handle exponent functions
+        if (character.includes('^')) {
+          var carrotIndex = character.indexOf('^')
+          var baseNumber = character.slice(0, carrotIndex)
+          var exponent = character.slice(carrotIndex + 1)
+          var result = baseNumber**(exponent)
+          // replace result into operationArray
+          operationArray[i] = result;
+        }
 
 
-        })
-
-
-        // if (operationArray.slice(i, i+1) === '√') {
-        //   var startIndex = i + 1
-        //   var endIndex;
-        //   for (var j = i + 1; j < arithmeticString.length; j++) {
-        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-        //       endIndex = j
-        //     }
-        //   }
-
-        //   // get inner value i.e. √49  => 49
-        //   var innerValue = Number(arithmeticString.slice(startIndex, endIndex))
-        //   ;
-        //   operationArray.push(innerValue**(.5));
-
-        // }
-
-
-        // // cos function
-        // if (arithmeticString.slice(i, i+3) === 'cos') {
-        //   var endIndex;
-        //   for (var j = i + 3; j < arithmeticString.length; j++) {
-        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-        //       endIndex = j
-        //     }
-        //   }
-        //   var innerValue = arithmeticString.slice(i + 3, endIndex)
-        //   innerValue += '=';
-        //   var innerValueResult = evaluateArithmeticString(innerValue)
-
-        //   operationArray.push(Math.cos(innerValueResult));
-
-        // }
-
-        // sin function
-
-          // if (arithmeticString.slice(i, i+3) === 'sin') {
-          //   var endIndex;
-          //   ;
-          //   for (var j = i + 3; j < arithmeticString.length; j++) {
-          //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-          //       endIndex = j
-          //     }
-          //   }
-          //   var innerValue = arithmeticString.slice(i + 3, endIndex)
-          //   innerValue += '=';
-          //   var innerValueResult = evaluateArithmeticString(innerValue)
-
-
-          //  var result = Math.sin(innerValueResult);
-          //   // handle edge case with JS making sin(pi) a very very small e-16 number instead of 0
-          //   if (result < 0.0001 && result > -0.0001) {
-          //     operationArray.push(0);
-          //   } else {
-          //     operationArray.push(Math.sin(innerValueResult));
-
-          //   }
-
-
-          // }
-
-        // tan function
-        // if (arithmeticString.slice(i, i+3) === 'tan') {
-        //   var endIndex;
-        //   ;
-        //   for (var j = i + 3; j < arithmeticString.length; j++) {
-        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-        //       endIndex = j
-        //     }
-        //   }
-        //   var innerValue = arithmeticString.slice(i + 3, endIndex)
-        //   innerValue += '='
-        //   ;
-        //   var innerValueResult = evaluateArithmeticString(innerValue)
-        //   operationArray.push(Math.tan(innerValueResult));
-
-        // }
-
-          // if not special function, push numbers to operationArray
-          // if (isNaN(Number(arithmeticString[i])) && arithmeticString[i] !== '.' && arithmeticString[i] !== 'π' ) {
-
+      })
 
 
 
