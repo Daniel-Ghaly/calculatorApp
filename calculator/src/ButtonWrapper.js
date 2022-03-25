@@ -6,7 +6,7 @@ function ButtonWrapper(props) {
   return (
     <div className = 'button-wrapper'>
       {props.buttons.map(button => {
-        return <button onClick = {() => props.handleButtonClick(button)}>{button}</button>
+        return <button className = {['+','-','/','x','='].includes(button) ? 'operation-button' : 'button'} onClick = {() => props.handleButtonClick(button)}>{button}</button>
       })}
     </div>
   );

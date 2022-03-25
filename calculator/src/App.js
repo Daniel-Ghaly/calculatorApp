@@ -14,9 +14,9 @@ FLOW OF CODE: starts at line 98
 function App(props) {
   var [arithmeticString, setArithmeticString] = useState('') //the 'screen' text => i.e. '6+3-2'
   var [result, setResult] = useState(null); // the resulting calculation after pressing '=' => '7'
-  var buttons = ['AC', '%', 'π', '/',7, 8, 9, 'x',
+  var buttons = ['AC', 'PREV', 'π', '/',7, 8, 9, 'x',
   4, 5, 6, '-', 1, 2, 3, '+',
-  0, '.', '=','c','(',')','sin','cos','tan','√','x^y','n!']
+  0, '.', 'c','=','(',')','sin','cos','tan','√','x^y','n!']
 
   function handleButtonClick(button) {
 
@@ -55,8 +55,9 @@ function App(props) {
 
        // handle edge case where pi has no operators but user presses '=' -> return pi value
        if (arithmeticString === ('π=')) {
-        setResult(Math.PI);
-        return Math.PI;
+        // round to 6 decimals for better readibility
+        setResult(Math.round(Math.PI * 100000) / 100000);
+        return Math.round(Math.PI * 100000) / 100000;
 
       }
 
@@ -140,7 +141,6 @@ function App(props) {
 
             }
 
-
           }
 
         // tan function
@@ -174,10 +174,29 @@ function App(props) {
       }
       operationArray.push(current);
 
+      debugger;
       // operationArray populated ==> now to evaluate the array...
 
 
-      // evaluate exponents first before multiplication/division (PEMDAS)
+      // evalulate factorial
+
+      operationArray.forEach((character, i) => {
+        if (character.includes('!')) {
+          // get n of factorial i.e. 25! ==> 25
+          var n = character.slice(0, -1)
+          var factorial = getFactorial(n)
+          // change factorial to evaluated result
+          operationArray[i] = factorial
+        }
+      })
+
+      function getFactorial(num) {
+        var product = 1;
+        for (var i = num; i > 0; i--) {
+          product *= i
+        }
+        return product;
+      }
 
       // evaluate products and quotients before addition/subtraction (PEMDAS)
       if (operationArray.includes('x') || operationArray.includes('/')) {
@@ -208,15 +227,11 @@ function App(props) {
         }
       });
 
-
-
       // update 'result' state
-      setResult(count);
+      // handle edge case where decimal is extremely long --> shorten to 6 digits for better readability
+      setResult(Math.round(count * 100000) / 100000);
       return count
-
-
     }
-
 
     // concatenate numbers and operation characters to the arithmeticString -- i.e. '6+2*3'
     if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y', 'n!'].includes(button) ) {
@@ -247,7 +262,6 @@ function App(props) {
         setResult(null)
       }
 
-
         // handle edge case where user inputs two operations in a row
       if (['+','-','x','/','=','x^y','^'].includes(arithmeticString.slice(-1)) ) {
         if(button === arithmeticString.slice(-1)) {
@@ -264,15 +278,14 @@ function App(props) {
       }
     }
 
-
     // if user clicks '=', evalulate result using evaluateArithmeticString function
     if (button === '=') {
 
-
      // handle edge case -- if only pi is inputted, convert to pi value
      if (arithmeticString === 'π=') {
-      setResult(Math.PI);
-      return Math.PI
+      // round to 6 deciamals for better readibility
+      setResult(Math.round(Math.PI * 100000) / 100000);
+      return Math.round(Math.PI * 100000) / 100000
     }
 
       // edge case: if user leaves out parentheses, automatically add second parenthesis
@@ -281,8 +294,6 @@ function App(props) {
         arithmeticString = arithmeticString.slice(0, -1)
         setArithmeticString(arithmeticString += ')=')
       }
-
-
 
       // check for parentheses to eveluate that arithmeticString first; exclude trig/sqrt/exponent functions for separation of concerns
       while (arithmeticString.includes('(') && !arithmeticString.includes('√(') && !arithmeticString.includes('^(')) {
@@ -308,8 +319,6 @@ function App(props) {
       // pass in arithmetic string to evaluateArithmeticString()
       evaluateArithmeticString(arithmeticString)
     }
-
-
       // delete characters of arithmetic string if user presses 'c' button
       if (button === 'c') {
         setArithmeticString(arithmeticString.slice(0, -1))
@@ -326,7 +335,6 @@ function App(props) {
         setArithmeticString('')
         setResult(null)
       }
-
 
   }
 

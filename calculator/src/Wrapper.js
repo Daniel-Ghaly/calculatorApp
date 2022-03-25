@@ -5,7 +5,7 @@ import ButtonWrapper from './ButtonWrapper.js'
 
 function Wrapper(props) {
   return (
-    <div>
+    <div >
       <Screen result = {props.result} arithmeticString = {props.arithmeticString} />
       <ButtonWrapper handleButtonClick = {props.handleButtonClick} buttons = {props.buttons}/>
     </div>
