@@ -18,40 +18,39 @@ function App(props) {
   4, 5, 6, '-', 1, 2, 3, '+',
   0, '.', 'c','=','(',')','sin','cos','tan','√','x^y','n!']
 
-  function handleButtonClick(button) {
+   // helper function to evaluate the arithmetic of two numbers
+   function evaluateTwoNums(num1, num2, operation) {
 
-    // helper function to evaluate the arithmetic of two numbers
-    function evaluateTwoNums(num1, num2, operation) {
-
-      if(num1 === 'π') {
-        num1 = Math.PI
-        console.log(num1)
-      }
-      if(num2 === 'π') {
-        num2 = Math.PI
-      }
-      if(operation === '+') {
-        return Number(num1) + Number(num2)
-      }
-      if(operation === '-') {
-        return Number(num1) - Number(num2)
-      }
-      if(operation === 'x') {
-
-        return Number(num1) * Number(num2)
-      }
-      if(operation === '/') {
-        return Number(num1) / Number(num2)
-      }
+    if(num1 === 'π') {
+      num1 = Math.PI
+      console.log(num1)
     }
+    if(num2 === 'π') {
+      num2 = Math.PI
+    }
+    if(operation === '+') {
+      return Number(num1) + Number(num2)
+    }
+    if(operation === '-') {
+      return Number(num1) - Number(num2)
+    }
+    if(operation === 'x') {
 
+      return Number(num1) * Number(num2)
+    }
+    if(operation === '/') {
+      return Number(num1) / Number(num2)
+    }
+  }
+
+
+  function handleButtonClick(button) {
 
     // helper function to evaluate any operation string (i.e. '6+3x8' ) and set result to 'result' state
     function evaluateArithmeticString(arithmeticString) {
       ;
       // initialize result
       var count = 0;
-
 
        // handle edge case where pi has no operators but user presses '=' -> return pi value
        if (arithmeticString === ('π=')) {
@@ -61,125 +60,187 @@ function App(props) {
 
       }
 
-      // convery arithmeticString to array i.e.  '10x7+2' ==> ['10','x','7','+','2']
+      // convert arithmeticString to array i.e.  '10x7+2' ==> ['10','x','7','+','2']
       var operationArray = [];
       let current = '';
       for (let i = 0; i < arithmeticString.length; i++) {
 
+
+        if (['x','-','/','+','='].includes(arithmeticString[i])) {
+          operationArray.push(current);
+          current = '';
+          operationArray.push(arithmeticString[i]);
+        } else {
+          current += arithmeticString[i];
+        }
+      }
+
+      operationArray.push(current);
+      operationArray = operationArray.slice(0, -1)
+
+
+
         // exponent functionality
 
-        if (arithmeticString.slice(i, i+1) === '^') {
-          var endIndex;
-          for (var j = i + 1; j < arithmeticString.length; j++) {
-            if (arithmeticString[j] === ')') {
-              endIndex = j
-            }
-          }
+        // if (operationArray.slice(i, i+1) === '^') {
+        //   var endIndex;
+        //   for (var j = i + 1; j < arithmeticString.length; j++) {
+        //     if (arithmeticString[j] === ')') {
+        //       endIndex = j
+        //     }
+        //   }
 
-          // get inner value i.e. √(49)  => 49
-          var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
-          operationArray.push((arithmeticString[i-1])**(innerValue));
+        //   // get inner value i.e. √(49)  => 49
+        //   var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
+        //   operationArray.push((arithmeticString[i-1])**(innerValue));
 
-        }
-
+        // }
 
         // sqrt functionality
-        if (arithmeticString.slice(i, i+1) === '√') {
-          var endIndex;
-          for (var j = i + 1; j < arithmeticString.length; j++) {
-            if (arithmeticString[j] === ')') {
-              endIndex = j
-            }
+        operationArray.forEach( (character, i) => {
+
+          // handle sqrt
+          if (character.includes('√')) {
+            var result = Number(character.slice(1))**(0.5)
+            // replace result into operationArray
+            operationArray[i] = result;
           }
 
-          // get inner value i.e. √(49)  => 49
-          var innerValue = Number(arithmeticString.slice(i + 2, endIndex))
-          operationArray.push(innerValue**(.5));
-
-        }
-
-
-        // cos function
-        if (arithmeticString.slice(i, i+3) === 'cos') {
-          var endIndex;
-          for (var j = i + 3; j < arithmeticString.length; j++) {
-            if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-              endIndex = j
-            }
+          // handle sin
+          if (character.includes('sin')) {
+            var result = Math.sin(Number(character.slice(3)))
+            // replace result into operationArray
+            operationArray[i] = result;
           }
-          var innerValue = arithmeticString.slice(i + 3, endIndex)
-          innerValue += '='
-          ;
-          var innerValueResult = evaluateArithmeticString(innerValue)
 
-          operationArray.push(Math.cos(innerValueResult));
+          // handle cos
+          if (character.includes('cos')) {
+            var result = Math.cos(Number(character.slice(3)))
+            // replace result into operationArray
+            operationArray[i] = result;
+          }
 
-        }
+          // handle exponent functions
+          if (character.includes('^')) {
+            var carrotIndex = character.indexOf('^')
+            var baseNumber = character.slice(0, carrotIndex)
+            var exponent = character.slice(carrotIndex + 1)
+            var result = baseNumber**(exponent)
+            // replace result into operationArray
+            operationArray[i] = result;
+          }
+
+
+        })
+
+
+        // if (operationArray.slice(i, i+1) === '√') {
+        //   var startIndex = i + 1
+        //   var endIndex;
+        //   for (var j = i + 1; j < arithmeticString.length; j++) {
+        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
+        //       endIndex = j
+        //     }
+        //   }
+
+        //   // get inner value i.e. √49  => 49
+        //   var innerValue = Number(arithmeticString.slice(startIndex, endIndex))
+        //   ;
+        //   operationArray.push(innerValue**(.5));
+
+        // }
+
+
+        // // cos function
+        // if (arithmeticString.slice(i, i+3) === 'cos') {
+        //   var endIndex;
+        //   for (var j = i + 3; j < arithmeticString.length; j++) {
+        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
+        //       endIndex = j
+        //     }
+        //   }
+        //   var innerValue = arithmeticString.slice(i + 3, endIndex)
+        //   innerValue += '=';
+        //   var innerValueResult = evaluateArithmeticString(innerValue)
+
+        //   operationArray.push(Math.cos(innerValueResult));
+
+        // }
 
         // sin function
 
-          if (arithmeticString.slice(i, i+3) === 'sin') {
-            var endIndex;
-            debugger;
-            for (var j = i + 3; j < arithmeticString.length; j++) {
-              if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-                endIndex = j
-              }
-            }
-            var innerValue = arithmeticString.slice(i + 3, endIndex)
-            innerValue += '='
-            ;
-            var innerValueResult = evaluateArithmeticString(innerValue)
+          // if (arithmeticString.slice(i, i+3) === 'sin') {
+          //   var endIndex;
+          //   ;
+          //   for (var j = i + 3; j < arithmeticString.length; j++) {
+          //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
+          //       endIndex = j
+          //     }
+          //   }
+          //   var innerValue = arithmeticString.slice(i + 3, endIndex)
+          //   innerValue += '=';
+          //   var innerValueResult = evaluateArithmeticString(innerValue)
 
 
-           var result = Math.sin(innerValueResult);
-            // handle edge case with JS making sin(pi) a very very small e-16 number instead of 0
-            if (result < 0.0001 && result > -0.0001) {
-              operationArray.push(0);
-            } else {
-              operationArray.push(Math.sin(innerValueResult));
+          //  var result = Math.sin(innerValueResult);
+          //   // handle edge case with JS making sin(pi) a very very small e-16 number instead of 0
+          //   if (result < 0.0001 && result > -0.0001) {
+          //     operationArray.push(0);
+          //   } else {
+          //     operationArray.push(Math.sin(innerValueResult));
 
-            }
+          //   }
 
-          }
+
+          // }
 
         // tan function
-        if (arithmeticString.slice(i, i+3) === 'tan') {
-          var endIndex;
-          debugger;
-          for (var j = i + 3; j < arithmeticString.length; j++) {
-            if (['x','-','=','/','+'].includes(arithmeticString[j])) {
-              endIndex = j
-            }
-          }
-          var innerValue = arithmeticString.slice(i + 3, endIndex)
-          innerValue += '='
-          ;
-          var innerValueResult = evaluateArithmeticString(innerValue)
-          operationArray.push(Math.tan(innerValueResult));
+        // if (arithmeticString.slice(i, i+3) === 'tan') {
+        //   var endIndex;
+        //   ;
+        //   for (var j = i + 3; j < arithmeticString.length; j++) {
+        //     if (['x','-','=','/','+'].includes(arithmeticString[j])) {
+        //       endIndex = j
+        //     }
+        //   }
+        //   var innerValue = arithmeticString.slice(i + 3, endIndex)
+        //   innerValue += '='
+        //   ;
+        //   var innerValueResult = evaluateArithmeticString(innerValue)
+        //   operationArray.push(Math.tan(innerValueResult));
 
-        }
+        // }
 
           // if not special function, push numbers to operationArray
           // if (isNaN(Number(arithmeticString[i])) && arithmeticString[i] !== '.' && arithmeticString[i] !== 'π' ) {
 
-            if (['x','-','/','+','='].includes(arithmeticString[i])) {
-              operationArray.push(current);
-              current = '';
-              operationArray.push(arithmeticString[i]);
-          } else {
-              current += arithmeticString[i];
-          }
 
-      }
-      operationArray.push(current);
 
-      debugger;
+
       // operationArray populated ==> now to evaluate the array...
 
 
-      // evalulate factorial
+      // handle edge case where no operation is inputted --> just return number
+      if (operationArray.length === 2) {
+        setResult(Math.round(operationArray[0] * 100000) / 100000)
+      }
 
+
+      // evaluate sin expressions
+      operationArray.forEach((character, i) => {
+        if (character.includes('sin')) {
+          ;
+          // get n of factorial i.e. 25! ==> 25
+          var n = character.slice(0, -1)
+          var factorial = getFactorial(n)
+          // change factorial to evaluated result
+          operationArray[i] = factorial
+        }
+      })
+
+
+
+      // evaluate factorial
       operationArray.forEach((character, i) => {
         if (character.includes('!')) {
           // get n of factorial i.e. 25! ==> 25
@@ -280,6 +341,7 @@ function App(props) {
 
     // if user clicks '=', evalulate result using evaluateArithmeticString function
     if (button === '=') {
+      ;
 
      // handle edge case -- if only pi is inputted, convert to pi value
      if (arithmeticString === 'π=') {
@@ -295,17 +357,17 @@ function App(props) {
         setArithmeticString(arithmeticString += ')=')
       }
 
-      // check for parentheses to eveluate that arithmeticString first; exclude trig/sqrt/exponent functions for separation of concerns
-      while (arithmeticString.includes('(') && !arithmeticString.includes('√(') && !arithmeticString.includes('^(')) {
-        debugger;
-        // substring between pair of (); i.e. '6+(3+4)' ==> '3+4'
+      // check for parentheses to eveluate that arithmeticString first
+      while (arithmeticString.includes('(')) {
+        ;
+        // get substring between pair of (); i.e. '6+(3+4)' ==> '3+4'
         var startIndex = arithmeticString.indexOf('(') + 1
         var endIndex = arithmeticString.indexOf(')')
         var parenSubstring = arithmeticString.slice(arithmeticString.indexOf('(') + 1, arithmeticString.indexOf(')'))
         parenSubstring += '='
         // evaluate substring. i.e. '3+4' ==> 7
         var result = evaluateArithmeticString(parenSubstring)
-        debugger;
+        ;
         arithmeticString = arithmeticString.split('')
         arithmeticString.splice(startIndex - 1, endIndex - startIndex + 2, result)
         arithmeticString = arithmeticString.join('')
