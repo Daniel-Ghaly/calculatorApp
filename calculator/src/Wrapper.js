@@ -9,7 +9,7 @@ function Wrapper(props) {
     <div >
       <div className = 'top-container'>
         <Screen  mode = {props.mode} result = {props.result} arithmeticString = {props.arithmeticString} />
-        <Mode  handleLightMode = {props.handleLightMode} handleDarkMode = {props.handleDarkMode}/>
+        <Mode  handleMode = {props.handleMode} handleDarkMode = {props.handleDarkMode}/>
       </div>
       <ButtonWrapper mode = {props.mode} handleButtonClick = {props.handleButtonClick} buttons = {props.buttons}/>
     </div>

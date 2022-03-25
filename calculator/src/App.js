@@ -1,12 +1,12 @@
 import './App.css';
 import Wrapper from './Wrapper.js'
-import {useState, useEffect} from 'react'
+import { useState } from 'react'
 
 /*
 
 FLOW OF CODE:
-1) as user presses characters on calculator, the characters get concatenated into a string (lines 63-248)
-2) when user presses equal sign, that string gets parsed into an array and a value is calculated (lines 251-430)
+1) as user presses characters on calculator, the characters get concatenated into a string (lines 38-41)
+2) when user presses equal sign, that string gets parsed into an array and a value is calculated and returned (lines 43-46)
 
 
 EDGE CASES:
@@ -26,22 +26,51 @@ function App(props) {
   var [index, setIndex] = useState(null) // set index variable to track history view
   var [mode, setMode] = useState('dark') // toggle between light/dark mode
 
-  // useEffect(() => {
-  //   // debugger;
-  //   console.log('result: ', result)
-  //    // clear result and arithmetic string if result view is currently being shown
-  //    if(result) {
-  //     setArithmeticString('');
-  //     setResult(null)
-  //   }
-  // }, [history])
+
 
   var buttons = ['AC', 'PREV', 'π', '/',7, 8, 9, 'x',
   4, 5, 6, '-', 1, 2, 3, '+',
   0, '.', 'c','=','(',')','sin','cos','tan','√','x^y','n!','1/x','x^2','log','ln']
 
-   // helper function to evaluate the arithmetic of two numbers
-   function evaluateTwoNums(num1, num2, operation) {
+
+  function handleButtonClick(button) {
+
+    // concatenate numbers and operation characters to the arithmeticString -- i.e. '6+2*3'
+    if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y', 'n!','1/x','x^2','log','ln'].includes(button) ) {
+      createArithmeticString(button)
+    }
+
+    // if user clicks '=', evalulate arithmeticString using evaluateArithmeticString helper function
+    if (button === '=') {
+    handleEqualSign(button)
+    }
+
+
+    // if user clicks 'PREV', evalulate show previous arithmetic and resulting value
+    if (button === 'PREV') {
+      handlePrev()
+    }
+
+
+
+    // handle the deletion of characters or clearing of screen
+    if (button === 'c' || button === 'AC') {
+      handleDeleteInput(button)
+    }
+
+  }
+
+  //toggle between light and dark mode
+  function handleMode(mode) {
+  if (mode === 'light') {
+    setMode('light')
+  } else if (mode === 'dark') {
+    setMode('dark')
+    }
+  }
+
+  // helper function to evaluate the arithmetic of two numbers
+  function evaluateTwoNums(num1, num2, operation) {
 
     if(num1 === 'π') {
       num1 = Math.PI
@@ -65,109 +94,92 @@ function App(props) {
     }
   }
 
+  function createArithmeticString(button) {
 
-  function handleButtonClick(button) {
+    // clear result and arithmetic string if result view is currently being shown
+    if(result) {
+      console.log('firing inside if result')
+      setArithmeticString(button.toString());
+      setResult(null)
+      return;
+    }
 
-    // concatenate numbers and operation characters to the arithmeticString -- i.e. '6+2*3'
-    createArithmeticString()
-
-    function createArithmeticString() {
-
-
-      console.log('handle button Click', result)
-
-
-      // clear result and arithmetic string if result view is currently being shown
-      if(result) {
-        alert('test')
-        setArithmeticString('');
-        setResult(null)
+    //handle x^2
+    if (button === 'x^2') {
+      var startIndex;
+      for(var i = arithmeticString.length - 1; i >= 0; i--) {
+        if (['x','-','+','/'].includes(arithmeticString[i]) || i === 0) {
+          startIndex = i
+          break;
+        }
       }
+      var base = arithmeticString.slice(startIndex)
+      var baseDigits= arithmeticString.slice(startIndex).length;
+      var endIndex = -1 * baseDigits
+      arithmeticString = arithmeticString.slice(0, endIndex)
+      var calculation = Number(base**2 * 1000000 / 1000000)
+      // round to 6 decimals
+      button = Math.round(calculation * 100000) / 100000
+    }
 
-
-      if(typeof button === 'number' || ['+','-','x','/','=','π','(',')', 'cos', 'sin', 'tan','.','√','x^y', 'n!','1/x','x^2','log','ln'].includes(button) ) {
-
-        //handle x^2
-        if (button === 'x^2') {
-          var startIndex;
-          for(var i = arithmeticString.length - 1; i >= 0; i--) {
-            if (['x','-','+','/'].includes(arithmeticString[i]) || i === 0) {
-              startIndex = i
-              break;
-            }
-          }
-          var base = arithmeticString.slice(startIndex)
-          var baseDigits= arithmeticString.slice(startIndex).length;
-          var endIndex = -1 * baseDigits
-          arithmeticString = arithmeticString.slice(0, endIndex)
-          var result = Number(base**2 * 1000000 / 1000000)
-          // round to 6 decimals
-          button = Math.round(result * 100000) / 100000
+    // handle 1/x
+    if (button === '1/x') {
+      var startIndex;
+      for(var i = arithmeticString.length - 1; i >= 0; i--) {
+        if (['x','-','+','/'].includes(arithmeticString[i]) || i === 0) {
+          startIndex = i
+          break;
         }
+      }
+      var bottomFraction = arithmeticString.slice(startIndex)
+      var bottomFractionDigits = arithmeticString.slice(startIndex).length;
+      var endIndex = -1 * bottomFractionDigits
+      arithmeticString = arithmeticString.slice(0, endIndex)
+      // button = `1/${bottomFraction}`
+      var calculation = Number(1/bottomFraction * 1000000 / 1000000)
+      // round to 6 decimals
+      button = Math.round(calculation * 100000) / 100000
+    }
 
-        // handle 1/x
-        if (button === '1/x') {
-          var startIndex;
-          for(var i = arithmeticString.length - 1; i >= 0; i--) {
-            if (['x','-','+','/'].includes(arithmeticString[i]) || i === 0) {
-              startIndex = i
-              break;
-            }
-          }
-          var bottomFraction = arithmeticString.slice(startIndex)
-          var bottomFractionDigits = arithmeticString.slice(startIndex).length;
-          var endIndex = -1 * bottomFractionDigits
-          arithmeticString = arithmeticString.slice(0, endIndex)
-          // button = `1/${bottomFraction}`
-          var result = Number(1/bottomFraction * 1000000 / 1000000)
-          // round to 6 decimals
-          button = Math.round(result * 100000) / 100000
-        }
+    // add factorial symbol to arithmeticString
+    if (button === 'n!') {
+      button = '!'
+    }
 
-        // add factorial symbol to arithmeticString
-        if (button === 'n!') {
-          button = '!'
-        }
+    // handle edge case where user inputs operation before number
+    if (arithmeticString.length === 0 && ['+','-','x','/','=','x^y','n!'].includes(button) ) {
+    return;
+  }
 
-        // handle edge case where user inputs operation before number
-        if (arithmeticString.length === 0 && ['+','-','x','/','=','x^y','n!'].includes(button) ) {
+    // auto-add first parenthesis for sqrt, trig, and log functions
+    if (['√', 'sin', 'cos', 'tan', 'log','ln'].includes(button)) {
+      button += '('
+    }
+
+    // add exponent ^ symbol when pressing x^y button
+    if (button === 'x^y') {
+      button = '^('
+    }
+
+
+      // handle edge case where user inputs two operations/special expressions in a row
+    if (['+','-','x','/','=','x^y','^','1/x'].includes(arithmeticString.slice(-1)) ) {
+      if(button === arithmeticString.slice(-1)) {
         return;
+      } else if (['+','-','x','/','=','x^y','^'].includes(button)) {
+        // still allow user to change operation without having to clear last character
+        arithmeticString = arithmeticString.slice(0, -1)
+        setArithmeticString(arithmeticString += button.toString())
+      } else {
+        setArithmeticString(arithmeticString += button.toString())
+      }
+    } else {
+      setArithmeticString(arithmeticString += button.toString())
       }
 
-        // auto-add first parenthesis for sqrt, trig, and log functions
-        if (['√', 'sin', 'cos', 'tan', 'log','ln'].includes(button)) {
-          button += '('
-        }
+  }
 
-        // add exponent ^ symbol when pressing x^y button
-        if (button === 'x^y') {
-          button = '^('
-        }
-
-
-          // handle edge case where user inputs two operations/special expressions in a row
-        if (['+','-','x','/','=','x^y','^','1/x'].includes(arithmeticString.slice(-1)) ) {
-          if(button === arithmeticString.slice(-1)) {
-            return;
-          } else if (['+','-','x','/','=','x^y','^'].includes(button)) {
-            // still allow user to change operation without having to clear last character
-            arithmeticString = arithmeticString.slice(0, -1)
-            setArithmeticString(arithmeticString += button.toString())
-          } else {
-            setArithmeticString(arithmeticString += button.toString())
-          }
-        } else {
-          setArithmeticString(arithmeticString += button.toString())
-          }
-        }
-    }
-
-    // if user clicks '=', evalulate result using evaluateArithmeticString helper function
-    if (button === '=') {
-    handleEqualSign()
-    }
-
-    function handleEqualSign() {
+  function handleEqualSign(button) {
 
 
     // edge case: if user leaves out parentheses, automatically add second parenthesis
@@ -200,54 +212,10 @@ function App(props) {
     // once parentheses expressions are simplified,
     // pass in arithmetic string to evaluateArithmeticString()
     evaluateArithmeticString(arithmeticString)
-    }
-
-    // if user clicks 'PREV', evalulate show previous arithmetic and resulting value
-    if (button === 'PREV') {
-      handlePrev()
-    }
-
-    function handlePrev() {
-
-      // handle edge case where user no further history; keep current view instead of making screen blank
-      if (index === 1) {
-        setArithmeticString(history[0][0])
-        setResult(history[0][1])
-      }
-
-
-      // get previous entry by subtracting 1 from current 'index' state
-      var currentHistory = history.slice()
-      var prevEntry = currentHistory[index - 2]
-      // set corresponding arithmetic string and result using prevEntry array
-      setArithmeticString(prevEntry[0])
-      setResult(prevEntry[1])
-      // subract index minus 1 for next next previous
-      setIndex(index - 1)
-    }
-
-
-
-    // delete characters of arithmetic string if user presses 'c' button
-    if (button === 'c') {
-      setArithmeticString(arithmeticString.slice(0, -1))
-      // if in result mode, let 'c' simply clear the whole
-      if (result) {
-        setResult(null)
-
-      }
-
-    }
-    // deletes entire arithmetic string and resets result to null if user presses 'ac' button
-    if(button === 'AC') {
-      setArithmeticString('')
-      setResult(null)
-    }
-
   }
 
-   // function to evaluate any operation string (i.e. '6+3x8' ) and set result to 'result' state
-   function evaluateArithmeticString(arithmeticString) {
+  // function to evaluate any operation string (i.e. '6+3x8' ) and set result to 'result' state
+  function evaluateArithmeticString(arithmeticString) {
     ;
     // initialize result
     var count = 0;
@@ -306,7 +274,6 @@ function App(props) {
 
       // handle log expressions
       if (character.includes('log')) {
-        debugger;
         var result = Math.log10(Number(character.slice(3)))
         // replace result into operationArray
         operationArray[i] = result;
@@ -314,7 +281,6 @@ function App(props) {
 
       // handle ln expressions
       if (character.includes('ln')) {
-        debugger;
         var result = Math.log(Number(character.slice(2)))
         // replace result into operationArray
         operationArray[i] = result;
@@ -429,21 +395,47 @@ function App(props) {
   }
 
 
-  //toggle between light and dark mode
-  function handleLightMode() {
-    setMode('light')
+  function handlePrev(button) {
+    // handle edge case where user no further history; keep current view instead of making screen blank
+    if (index === 1) {
+      setArithmeticString(history[0][0])
+      setResult(history[0][1])
+    }
 
+
+    // get previous entry by subtracting 1 from current 'index' state
+    var currentHistory = history.slice()
+    var prevEntry = currentHistory[index - 2]
+    // set corresponding arithmetic string and result using prevEntry array
+    setArithmeticString(prevEntry[0])
+    setResult(prevEntry[1])
+    // subract index minus 1 for next next previous
+    setIndex(index - 1)
   }
 
-  function handleDarkMode() {
-    setMode('dark')
 
+  function handleDeleteInput(button) {
+    // delete characters of arithmetic string if user presses 'c' button
+    if (button === 'c') {
+      setArithmeticString(arithmeticString.slice(0, -1))
+      // if in result mode, let 'c' simply clear the whole
+      if (result) {
+        setResult(null)
+
+      }
+
+    }
+    // deletes entire arithmetic string and resets result to null if user presses 'ac' button
+    if(button === 'AC') {
+      setArithmeticString('')
+      setResult(null)
+    }
   }
 
 
   return (
     <div className = 'wrapper'>
-      <Wrapper mode = {mode} handleLightMode = {handleLightMode} handleDarkMode = {handleDarkMode} result = {result} arithmeticString = {arithmeticString} handleButtonClick = {handleButtonClick} buttons = {buttons}/>
+      <Wrapper mode = {mode} handleMode = {handleMode} result = {result} arithmeticString = {arithmeticString} handleButtonClick = {handleButtonClick} buttons = {buttons}/>
     </div>
   );
 }

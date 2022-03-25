@@ -42,9 +42,12 @@
   font-size: large;
 }
 
-
 button:hover {
   opacity: 0.8;
+}
+
+.button-light:hover {
+  background-color: lightgray;
 }
 
 .light {
