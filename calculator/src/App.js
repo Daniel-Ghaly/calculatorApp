@@ -96,12 +96,28 @@ function App(props) {
 
   function createArithmeticString(button) {
 
-    // clear result and arithmetic string if result view is currently being shown
+     // handle logic where result is already calculated --> edge case #1: user presses an operation to continue doing arithmetic on current calculated result; edge case #2: user presses number, which will clear screen and "reset" the calculator
+
     if(result) {
-      console.log('firing inside if result')
-      setArithmeticString(button.toString());
-      setResult(null)
-      return;
+      // handle edge case #1 -- allow user to continue operating
+      if (['-','x','+','/'].includes(button)) {
+        var currentString = arithmeticString.slice()
+        currentString = arithmeticString.slice (0, -1)
+        setArithmeticString(currentString += button);
+        return;
+      }
+      if (['-','x','+','/'].includes(arithmeticString[arithmeticString.length - 1])) {
+        var currentString = arithmeticString.slice()
+        setArithmeticString(currentString += button);
+        return;
+      }
+
+      // handle edge case #2 -- clear screen for user
+      if (button !== '=') {
+        setArithmeticString(button.toString());
+        setResult(null);
+        return;
+      }
     }
 
     //handle x^2
