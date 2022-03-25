@@ -10,11 +10,30 @@
 
 }
 
-.button {
+.top-container {
+  display: flex;
+}
+
+.mode {
+  margin-top: 10px;
+  margin-left: 10px;
+  align-self: center;
+}
+
+
+
+.button-dark {
   background-color: rgb(17, 5, 147);
   color: white;
   font-size: large;
 
+}
+
+.button-light {
+  background-color: rgb(244, 244, 244);
+  color: black;
+  font-size: large;
+  font-weight: bold;
 }
 
 .operation-button {
@@ -23,8 +42,25 @@
   font-size: large;
 }
 
-.button::hover {
-  background: white;
+
+button:hover {
+  opacity: 0.8;
+}
+
+.light {
+  font-size: 20px;
+  background-color: rgb(244, 244, 244);
+  color: black;
+  margin-right: 5px;
+  cursor: pointer;
+
+}
+
+.dark {
+  font-size: 20px;
+  background-color:  rgb(17, 5, 147);
+  color: white;
+  cursor: pointer;
 }
 
 .operation-string {
@@ -35,6 +71,17 @@
   display: flex;
   justify-content: end;
   background-color: rgb(211, 210, 210);
+
+}
+
+.operation-string-light {
+  width: 25%;
+  height: 50px;
+  border: 1px solid;
+  margin-top: 10px;
+  display: flex;
+  justify-content: end;
+  background-color: rgb(235, 235, 235);
 
 }
 
